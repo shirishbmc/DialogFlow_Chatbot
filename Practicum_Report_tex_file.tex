@@ -1,0 +1,723 @@
+\documentclass[10pt,conference]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{appendix}
+\title{Khetihar-Chat: An Agricultural Serverless Smart Chatbot in a Multi-user Environment}
+\makeatletter
+\newcommand{\linebreakand}{%
+  \end{@IEEEauthorhalign}
+  \hfill\mbox{}\par
+  \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+\makeatother
+\author{
+  \IEEEauthorblockN{Shirish Sonawane}
+  \IEEEauthorblockN{Student ID: 19210656}
+  \IEEEauthorblockA{Dublin City University}
+  \IEEEauthorblockN{School of Computing.}
+   \IEEEauthorblockA{Dublin, Ireland } 
+   \IEEEauthorblockN{Supervisor: Dr. Long Cheng}
+   \textit{shirish.sonawane2@mail.dcu.ie}
+  \and
+  \IEEEauthorblockN{Ankit Pandey}
+  \IEEEauthorblockN{Student ID: 19211298}
+  \IEEEauthorblockA{Dublin City University}
+  \IEEEauthorblockN{School of Computing.}
+  \IEEEauthorblockA{Dublin, Ireland } 
+  \IEEEauthorblockN{Supervisor: Dr. Long Cheng}
+  \textit{ankit.pandey4@mail.dcu.ie}
+}
+
+
+
+\begin{document}
+\maketitle
+\thispagestyle{plain}
+\pagestyle{plain}
+{\raggedright
+\textbf{ABSTRACT}
+}
+
+
+{\raggedright
+\textbf{According to IBEF.org \cite{botscognitive}, 58\% of the Indian population relies solely on Agriculture as its primary source of livelihood. But economic survey 2019-2020, suggests that agriculture growth in India has been stagnant for the past 6 years around 2.9\% annually. This is a real concern as such a huge population of India still depends on it. This problem can be resolved if farmers have access to information and expert advice (e.g. if they know when to irrigate, which seeds to sow and which pesticides to use that significantly impact the growth). In this paper, we report our exposure to design a multi-user chat application consisting of a smart chatbot, called Khetihar-Chat. To understand farmer’s information need, we conducted an evaluative survey near a small village called Pabal, Taluka Kendur near Pune focusing mainly on the usability of the system, acceptability of the information gathered from a machine and understanding the user unique preferences, needs, and challenges in using the technology. We found that a chat application with a multi-user environment consisting of experts along with a smart chatbot is more acceptable than a one-to-one conversational chatbot. Also, the use of images is considered easier to explain problem rather than explaining it \cite{bhattacharya2019remote}.  More broadly, our results could inform future work on designing a one-to-many chat application with conversational agents for user populations with semi literacy and technology experience.
+}}
+\newline
+\newline
+{\raggedright
+\textbf{Key words: }Serverless, Function as a service, cloud Functions, DialogFlow, Slack integrations, Firebase, BigQuery, Fulfillment, API’s.
+}
+
+
+
+	\section{INTRODUCTION}
+
+{\raggedright
+Research \cite{botscognitive} shows that 58\% of the Indian population still depends upon agriculture as their primary source of income. But growth in the agriculture sector is stagnant at 2.9\% annually. This is because of a lack of information and expert advice which farmers need urgently to take decisions. Furthermore, we found in our study, those villages near major cities in India have a large number of people with semi literacy and technical experiences as their children have already moved to these big cities, and with such displacement, they have brought some technical experience back to their parents. This growing technical experience in such villages can be utilized to solve this information mismatch. Such information includes when to irrigate using pumps and not rely on rain (farmers in villages usually rent pumps from big farmers or water tank owners), which seeds to sow and when, understand crop disease, weather forecasting, and optimal harvesting times. However there is a shortage of such information, and even if they have information trust factor comes into effect as there entire money and hard work of months has been invested into their crops. Also, the adult literacy rate in India is the lowest in the world. 
+\newline
+Several solutions have been proposed in the past to tackle this information access problem in rural India, this includes conducting farmers seminars in such areas, one-to-one video calling facilities, NGOs like Krushi Vikas Va Gramin Parashikshan Sanstha, etc. Since 2004, Indian Government has been managing a call-center based support for farmers in India called as Kisan call center (KCC). KCC operates in 22 local languages that are most popular in India and is open daily from 6 am to 10 pm. But as this facility is operated manually, it has limitations in terms of people it can attend at a time. According to some reports, 1.1 million people called KCC in the year 2014 out of which 40\% calls went unanswered. And since then there have been no reports related to unanswered calls by KCC. Therefore we need a robust, scalable, and real-time solution to this problem in which a one-to-one system cannot suffice. In this paper, as a potential solution to the above-mentioned problems, we introduce a multi-user chat application with a conversational chatbot to provide farmers with farming-related solutions. Specifically, Our chatbot application offers certain advantages that can tackle several of the above-mentioned problems.
+}
+\begin{itemize}
+	\item[1.]  First, conveying crop-related problems with an image is easier than explaining it. Some farmers may have color blindness because of which they cannot describe crop disease easily. In such cases, they can click a photograph of the leaf where they see some dissimilarity and send it to the chatbot, which by performing image analysis on the photograph of the leaf can label it with a crop disease easily and more accurately. 
+	\item[2.] Second, from a system point of view, deploying such apps serverless in a cloud space provides an advantage over the efforts required for scalability and managing the application server. In fact, with such a deployment infrastructural costs for running a server-based application are reduced to a significant amount. Also, with this solution, any number of users can be accommodated. 
+	\item[3.] Finally, farmers feel more secured when they can communicate with human experts along with conversational chatbots. This is because; here they can ask questions to real humans if they do not understand the results obtained from a chatbot. A majority of people still do not fully trust computers in rural areas of developing countries.
+
+\end{itemize}
+
+{\raggedright
+Our research mainly focuses on technology to support agriculture-related activities. We focus on UI for literate and semi-literate Users, Multiuser support for conversational systems, Serverless computing, Image Processing using AutoML, and sentimental analysis.
+}
+
+
+{\raggedright
+Dialogflow and Slack integration are used as Front-end to communicate with Farmers. To store the images of plant village dataset and the vegetation details, Google Storage and Firebase Real-time Database has been used . We have used Fulfillment code to implement Serverless with Google cloud functions. Several APIs have been used, such as weather, news to help the agricultural concerns. Google's AutoML has been used to create Models for Image identification and Sentimental analysis features \cite{sauglam2016developing}. Twitter data dataset is used as Dataset for modeling Sentimental analysis, whereas the Plant village dataset has been used to model Image identification function.
+}
+
+{\raggedright
+Section 2 mentions about the related concepts in process discovery, Section 3 illustrates about interviews and workshops with Farmers and gathering design specifications, Section 4 introduces the detailed design of our approach about each function. We report the experimental results in Section 6. Future work in 7 and finally conclude this paper in Section 8. \newline\newline
+}
+
+
+	\section{RELATED WORK:}
+
+{\raggedright
+In general, our research mainly focuses on technology to support agriculture-related activities. We focus on UI for literate and semi-literate Users, Multiuser support for conversational systems, Serverless computing, Image Processing using AutoML, and sentimental analysis. Designing guidelines for online information for literate and illiterate users has been a growing area of research. The scope of online information has spanned across various domains like employment search , electronic bulletin board financial management  video email  agriculture and healthcare . Research shows that more than one-third of the illiterate adult population lives in India. The online information tools have been designed based on the different levels of literacy. In the case of users with having low literacy, information tools with minimal text have been proven more useful. Results show that the semiliterate users eventually reduced the usage of audio support; their reduction is further accompanied by visual word recognition. Research shows that the semiliterate and literate users should be treated differently from illiterate users. Our guideline for low literate users is to include less text and more visual word recognition. Research Prototypes with having minimal text interactions have been created for illiterate users. It also discusses the trends that are emerging in this design space and gives opportunities for research and design, which is targeted for the population with low literacy. It also allows incidental learning for the illiterate and semiliterate users, which are important for reading skill reinforcement. It discusses the strong trends that are starting to emerge in this design space and concludes the opportunities and future directions for research and design of UIs targeted at populations with low-literacy.Khetihar considers the needs of literate, semiliterate, and illiterate users by providing text and visual conversation design.
+\newline
+\newline
+Research \cite{castro2017serverless} has contributed a lot in developing technological solutions to help farmers in growing countries with their information needs. Research shows that Farmers usually reside in rural areas with low literacy levels; Most of the proposed solutions depend heavily on voice for interactions. IVR systems and automated calls providing agriculture-related information do not have the depth of crop-related advice. Also, the conditions of climate, soil type, different types of vegetation, hence a majority of the proposed solutions rely heavily on voice as an interaction modality.The research \cite{jain2018farmchat} shows the limitations of Q\&A communities.The challenges of limited information, time constraints in responses, the medium of communication, creates difficulties for agricultural productivity in China. To overcome these limitations, they have come up with Farm Doctor. Farm Doctor has an extensive database of farm-related queries. With 690 thousand questions and over 3 million answers, their finding is a boon to the farmers in China. Research has contributed immensely in developing technological solutions to help farmers in developing regions with their information needs.
+\newline
+\newline
+Research \cite{salvi2019jamura} has shown that advanced technological solutions, such as agriculture chatbots, community-based questions, and answers wireless sensor network-based solutions have helped in many challenging agriculture-related tasks such as disease prediction, disease detection, advisory systems, grading of crops, \cite{sabharwal2020introduction} yield prediction and automatic harvesting. However, these technological solutions do have limitations about the lack of information and experts. VideoKheti proposed a multimodal method for illiterate farmers to search for specific videos. However, the farmers in rural India mostly have Bandwidth and network concerns. In Khetihar, we have used a similar approach, we have stored the agricultural items and the information related to them in the Database. Based on the queries, detailed information about that item provided as a response. Another difference is we also have experts available in the conversation forums, which can respond to complex queries or provide the  information which is not available in the Database. In this work, we have attempted to implement solutions to the mentioned shortcomings.
+\newline
+\newline
+As per research \cite{singh2020plantdoc} authors have emphasized the limitations of Questions and Answers communities. The challenges of limited information, time constraints in responses, the medium of communication, creates challenges for agricultural productivity in China \cite{sulistyantoeffectiveness}. To overcome these limitations, they have come up with Farm Doctor. Farm Doctor has an extensive database of farm-related queries. With 690 thousand questions and over 3 million answers, their finding is a boon to the farmers in China. In this work, we have used a similar approach, the key difference being this architecture can be used on various platforms apart from agriculture. We have stored the agricultural items and the information related to them in the Database. Based on the queries, detailed information about that item provided as a response. Another difference is we also have experts available in the conversation forums, which can respond to complex queries or provide the information which is not available in the Database. This enhancement would help the farmers increase their productivity.
+\newline
+\newline
+Joshi and Ruikar introduced a model that performs sentimental analysis on each user device and sends the result to the application server for further assessment \cite{joshi2019sentiment}. Research mainly focuses on each multiple user sentiments and does not look into the overall chat application sentiment for say within a time frame. It shows that logistic regression has been performed on all users’ devices and sent the computed score to the application server running continuously. The main issue with this approach is that it requires continuous running of an application server, which is costly, and also computing done on each user's device consumes their device computing power and battery. Also, this approach does not take into account the sentiment of a chat group as a whole. In this work, we have worked on the mentioned limitations and make it more effective based on the intelligence and the cost factor.
+\newline
+\newline
+Zeng and Zhang \cite{shen2020helping} \cite{zeng2020machine} research presents an experimental machine learning (ML) model based on Google Cloud AutoML Vision instead of a handcrafted neural network for identification of invasive ductal carcinoma (IDC).  A public dataset of 278,124 labelled histopathology images was used as the original dataset for model creation. Their research shows that ML algorithms have great potential for invasive ductal carcinoma (IDC) identification. It mentions that they  had challenges building an effective ML model through conventional processes, due to the complexity of deep learning CNN's algorithms and architecture Handcrafting a CNN-based ML model for IDC identification. Researchers found out that AutoML is particularly attractive when combined at scale with cloud computing such as AWS and Google Cloud Platform, where elastic cloud infrastructure and resource advantages can be utilized. They achieved 91.6\% average accuracy (AuPRC) from the model evaluation, 84.6\% balanced accuracy from the held-out test and concluded experimental AutoML Vision model outperforms the ones reported in the earlier studies. We have used a similar approach in Khetihar to identify leaf disease detection. Since it's a universal cloud-based architecture, we utilized the cloud-based features as well as AutoML precision and accuracy helped us to achieve the goal.
+\newline
+\newline
+In the work, Bharti and Bajaj have described conversational bot “Aapka Chikitsak” on Google Cloud Platform (GCP) \cite{deng2009imagenet}. The Study shows that their App helps in delivering telehealth in India to increase the patient's access to healthcare knowledge and leverage the potentials of artificial intelligence to bridge the gap of demand and supply of human healthcare providers. It \cite{sabharwal2020introduction} also mentions how they used DialogFlow and capabilities of Google's ML, which allows scaling of applications to hundreds of millions of users. Researchers claim that their chatbot has the potential to receive supportive care without having to physically visit a hospital by using a conversational artificial intelligence-based application for their treatment. The author’s also mentioned how conversational chatbot has resulted in reducing the barriers for access to healthcare facilities and procures intelligent consultations remotely to allow timely care and quality treatment, thereby effectively assisting the society. Similarly, Khetihar will help to resolve the queries of the Farmers online, preventing them from facing the Challenges of COVID situations, thereby helping the society. We have used similar technology as mentioned in the paper. The scaling capabilities of our research would be on par with the numbers as mentioned in the above paper.
+\newline
+\newline
+Nagarajah and Poravi \cite{sardogan2018plant} have taken a deep dive into the algorithms used in Machine learning . As per the authors designing an effective learning model is often tedious and only done well by experts, with deep knowledge of machine learning algorithms and domain expertise \cite{militante2019plant}. Most others choose an algorithm by intuition and go ahead with whatever the default values the parameters were assigned by the learning tool they are using. Sometimes they use brute force techniques to find the best performing model, but with infinite possibilities of algorithms and parameters, it becomes highly infeasible \cite{yan2016building}.This paper presents an analysis of the previous work in the domains of AutoML, hyper parameter tuning, and meta-learning. It also mentions the strongholds and drawbacks of the various approaches in terms of algorithms, supported features, and their implementations. We have used AutoML for Images identification in this research work. Based on the analysis and in-depth study of the authors, it helped us to finalize using AutoML as a technology in the research. It gives us deep insights into the algorithms used in our research, which provides higher precision and accuracy in the predictions of the model \cite{maldonado2019natural}.
+}
+
+
+	\section{Formative Findings}
+
+
+
+{\raggedright
+We have used internet website veggieharvest.com as the source of information for vegetation details. This website has details about vegetation and its related queries. Details about vegetables, herbs, gardening information, gardening calendars are provided on the website. We used the details such as plant days to Maturity, growing season, soil ph. value... Based on the type of queries, these details are provided as responses in the Chatbot users. If for a particular query from Farmer, details are not available in the database, then experts are asked to provide the details. These details from Experts are stored in the database immediately. If another farmer asks the same query, the details are retrieved based on the previous conversations and provide as responses. This self-learning feature ensures data is updated and stored in the Firebase Real-time Database. We also referred to information queries from Kisan Call Center (KCC).KCC is an Indian government call Center for farmers and their agricultural queries. The logs of KCC from January 2015 to September 2017 were made publicly available. This dataset consists of 8,012,856 calls. It has details about the solution that was provided by experts, to the agricultural-related queries from Farmers.  Some of the data was not complete.\newline
+To ensure we have complete and correct data from the website, we conducted semi-structured interviews with 50 farmers and three male Agri-experts, in June-July 2020. Due to Covid-19, we could not reach out to many farmers as planned. We worked closely with a local agriculture NGO (Non-Governmental Organization) in Pabal (a village in the northern part of India, in the state of Maharashtra). The experts were also called as Krishi Adhikari's and are officials of the local NGO Agriculture department. These Krishi Adhikari’s helped us in recruiting the farmers and obtained their consent. Out of the 50 Farmers, 38 were male, 12 were Females. 24 Farmers were literate (could read, write and speak Hindi, Marathi), 20 were literate (could speak and read Hindi, Marathi), six were illiterate (could only speak Marathi). 24 Farmers had smartphones with Internet access. The Krishi Adhikari's were Graduate degree holders from a reputed college and had more than 15 years of Agriculture experience.\newline
+The source of information for Plant leaf disease identification function is the "Plant village" dataset. This dataset consists of 54303 healthy and unhealthy leaf images divided into 38 categories by species and disease. We used six different augmentation techniques for increasing the dataset size. The methods used to create this dataset are image flipping, Gamma correction, noise injection, PCA Color augmentation, rotation, and scaling. One of the researchers conducted the interviews. The interviews were conducted in Marathi and took about 15 mins; they were further transcribed to English. The main questions we framed were; what type of information do the farmers need?  What is Farmer’s primary source of Information? What are the concerns with the primary source of information? These details gave us deep insights and motivated us during the creation of the chatbot.
+}
+\newline
+\newline
+\subsection{Gathering Requirements for design specifications }
+\subsubsection{Information needs}
+
+{\raggedright
+The questions and answers we got from the interviews with the farmers were similar to the KCC dataset.
+}
+
+\textbf{Plant Protection:}
+{\raggedright
+More than half of the questions in the KCC dataset were regarding remedies for protecting plants against diseases and pests. Questions like which is the disease on plants, which spray to apply to cure that particular disease. Identification of the disease was the major concern in the KCC dataset \cite{nagarajah2019review}. In khetihar, we have used Image identification algorithms on the plant village dataset. Khetihar also provides solutions based on the identified disease on plant leaves. A farmer can upload the image of the diseased leaf to khetihar and can get all the details about that disease and its remedy.
+}
+
+\textbf{Weather:}
+{\raggedright
+Weather comprised the second most quantity of questions in the KCC dataset. Questions like what is the forecast of the weather. What implications will it have on the vegetation? This was also the major query in the interview sessions with the farmers and the experts that were carried out for the research. Questions like - It is going to rain tomorrow? can we spray the pesticide today? The farmers heavily relied on the local TV channels and the response from the KCC experts. In Khetihar, we have addressed this problem by providing the weather Forecast.
+}
+
+\textbf{Best Practices:}
+{\raggedright
+Another major question in the KCC dataset, and the interviews conducted by the researchers is about the best practices? What is the total growth time? What should be soil ph. Value? There were various queries about the plantation schedule. These kinds of queries can lead to long conversations. Considering the number of Farmers in India, the KCC had its limitations to attend all the calls from every farmer.  
+Khetihar is designed to have all these concerns. Information stored in the database in the form of optional answers, which is easy for the farmers to understand.
+}
+
+\textbf{Unbiased Recommendations on Products: }
+{\raggedright
+Farmers expected unbiased answers on the fertilizers, seeds, agriculture tools. Biasing would mean advertising on particular products by vendors and selling them to make profits. Khetihar is not affiliated with any production house and is unbiased. 
+}
+\newline
+\newline
+
+\subsection{Design Requirements based on the interviews conducted }
+
+{\raggedright
+As discussed earlier, we focussed on farmer's sources of information for the agricultural queries. Based on the information we gathered from the farmers and the agri-experts we identified the design requirement for khetihar.
+}
+
+\textbf{Specificity:}
+{\raggedright
+ The major concern observed in KCC was the diagnosis of the diseases on crops \cite{albayrak2018overview}. It is difficult to explain all the symptoms correctly on the call and also equally difficult for a KCC expert to identify the disease based on the limited information provided by the Farmers. Khetihar takes care of the above concern by image Processing techniques using AutoML, which has much higher accuracy than the handmade algorithms. Farmers can upload the picture of the diseased leaf and get the diseases identified exactly. 
+}
+
+\textbf{Localization:}
+{\raggedright
+Local conditions have to be considered while giving resolutions to the farmers' queries. The solutions might be right however the conditions might not have been considered while providing the solution of that location. Khetihar takes this concern into account and based on the location and the weather information gives solutions to the queries of the Famers
+}
+
+\textbf{Trust:}
+{\raggedright
+ Trust is one of the major factors while taking feedback from experts or KCC. Even after receiving the solution, most farmers do not implement them due to trust issues. While designing khetihar, a deep study has performed to reply to every query in a specific manner logically. This is an open question of whether Farmers could trust Khetihar. This will be studied further as more Farmers use Khetihar.
+ }
+
+\textbf{Persistence:}
+{\raggedright
+Many times Farmers ask the same questions as they could not note or hear the solution for the queries on the phone. Some of the farmers might have disabilities which could lead to missing the solutions by the experts. In khetihar, since this is an automated solution based on intents, a user can ask the same question n number of times with the same answer. User can also save chat history for further use.
+}
+
+\textbf{Availability:}
+{\raggedright
+KCC and Agriculture experts have specified timings of work and may not be always available. Also, Farmers may not be comfortable contacting the Agri-experts multiple times, however, khetihar can be logged on to anytime and the  necessary information could be retrieved from the mobile device.\newline
+To meet the above all requirements, we give our detailed design in the following section. "Khetihar chatbot Serverless System Design".The interviews with Farmers helped us a lot to identify the design requirements, which motivated us to embed all the features -specificity, trust, Persistence, availability, unbiased recommendations into Khetihar. Also, its Serverless technology makes it cost-effective, making this an ideal agricultural app for the farmers. khetihar has an edge over other agricultural chatbots in the market considering its design.
+\newline
+}
+
+
+\section{Khetihar chatbot Serverless System Design}
+In this section, we will describe how we have developed Khetihar-Chat (Fig. 1). We will start by giving an overall system’s overview, Followed by describing each function with a use case scenario to explain how users will interact with Khetihar-Chat.\newline
+\subsection{System Design:}
+
+
+\begin{figure}[h]
+  \includegraphics[keepaspectratio=true,scale=0.5]{architecture1.png}
+  \caption{Universal Architecture of a smart Chatbot in a multi-user environment  }
+\end{figure}
+
+\begin{figure}[h]
+ \centering
+  \includegraphics[keepaspectratio=true,scale=0.2]{DB_read2.jpg}
+  \caption{User Interface Khetihar Chatbot  }
+\end{figure}
+
+{\raggedright
+For making the user interface of our Khetihar-Chat we have used slack in the front end as it is very similar to the WhatsApp chat application that many farmers are familiar with. User/Farmer asks questions in the app as he/she would in a WhatsApp chat (i.e. in a natural language they usually interact with other people on chat \cite{ahmady2020telegram}. Our Khetihar-Chat app will process this message and links it with the intent it is close to. After processing the user query, a response is made back to the slack app installed on the farmer’s smartphone. Earlier works on this problem have already covered speech to text way of communicating; therefore our main concern here was to incorporate some of the machine learning features like image analytics and sentimental analytics to make it more users friendly and precise than ever before.
+\newline 
+From the User interface shown, as farmer types the text, a user query is generated from the slack and this query is taken in by the DialogFlow agent (Fig. 2). The agent then links it with appropriate intent and the fulfillment code associated with that function is invoked. As deployment is completely done in a serverless platform, money is charged only when the app is in use. The agent then forms a response based on the result from the fulfillment code, which is then sent as a message in the Khetihar-Chat.\newline
+\newline
+}
+\subsection{Cloud Functions}
+{\raggedright
+In this work, we propose a universal architecture of a smart Chatbot  in a multi-user environment that consists of components required to build, train, set up, and manage AI-rich chatbots for customers to interact in all verbal exchange channels. It is designed to stand up to the maximum complicated enterprise and IT requirements, without requiring changes to existing structures, guidelines, or procedures. We have used Google’s DialogFlow technology along with other technologies such as Google VISION API for image Identification, AutoML for sentiment analysis, Firebase storage, BigQuery, Fulfillment code. Below mentioned functions have been implemented in our Khetihar-Chat with the help of the above-mentioned components\newline\newline
+}
+{Below mentioned are all the functions in details\newline}
+
+	
+
+
+\subsubsection{ Function: Image Identification(Leaf disease detection)}
+
+
+{\raggedright
+This Function performs supervised learning using AutoML, which involves training a computer to recognize patterns from labelled data. Using supervised learning, it helps to create, train the model to identify the patterns and labels of leaves and their diseases using Plant Village Dataset. Google Cloud AutoML is an alternative to handmade neural network modelling. The precision and accuracy are higher as compared to traditional modelling methods. AutoML is the automatic process of model algorithm selection, hyperparameter tuning, iterative modelling, and model assessment. The logic of AutoML works using reinforcement learning and recurrent neural network. AutoML RNN will propose a random set of hyper-parameters such as nodes per layer, layer count...etc. then the model will be built with such parameters.
+}
+
+
+{\raggedright
+As an example, here is typical conversation with our Khetihar-Chatbot (Fig. 4).
+}
+
+{\raggedright
+-------------------------------------
+}
+
+
+{\raggedright
+\textbf{Farmer1:} I have a problem with my crop, image corresponding to it is.
+\newline
+\textbf{Bot:}  Problem with this leaf is : Potato early blight.
+\newline
+\textbf{Farmer1:} how to solve this problem of Potato early blight.
+\newline
+\textbf{Bot:} Treatment of early blight includes prevention by planting potato varieties that are resistant to the disease; late maturing are more resistant than early maturing varieties. Avoid overhead irrigation and allow for sufficient aeration between plants to allow the foliage to dry as quickly as possible.
+\newline
+\textbf{Expert:} Spray potato crops with a protective fungicide before signs of blight appear. Start from June, especially if the weather's wet. Spray again after a few weeks to protect new growth.
+\newline
+}
+
+\begin{figure}[h]
+ \centering
+   \includegraphics[keepaspectratio=true,scale=.9]{type_of_leaves.png}
+  \caption{Types of leaves for diseases identification }
+\end{figure}
+
+\begin{figure}[h]
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.5]{image_dentification_mobile.jpg}
+  \caption{Farmer asking expert about the diease on Potato Leaf. }
+\end{figure}
+
+
+{\raggedright
+\textbf{Dataset for Image Classification:}
+}
+
+
+{\raggedright
+The "Plant village" dataset consists of 54303 healthy and unhealthy leaf images divided into 38 categories by species and disease (Fig. 3). We used six different augmentation techniques for increasing the data-set size. The methods used to create this dataset are image flipping, Gamma correction, noise injection, PCA Color augmentation, rotation, and Scaling.
+Some of the classes of plant leaves in dataset are mentioned below.
+}
+
+
+
+
+\begin{itemize}
+	\item[-] Pepper\_bacterial\_spot.
+	\item[-] Pepper\_healthy.
+	\item[-] Potato\_early\_blight.
+	\item[-] Potato\_healthy.
+	\item[-] Potato\_late\_blight.
+\end{itemize}
+
+{\raggedright
+\textbf{Dataset Preparation}
+}
+
+{\raggedright
+A training dataset is used to build a model. The model tries multiple algorithms and parameters while searching for patterns inside the training data. As the model identifies patterns, it makes use of the validation dataset to test the algorithms and patterns. The exceptional performing algorithms and styles are chosen from those diagnosed all through the training stage. After the high-quality performing algorithms and styles were identified, they may be tested for error rate, fine, and accuracy the usage of the take a look at dataset (Fig. 3).
+At each stage validation and a check dataset are used for you to avoid bias within the model. at some point of the validation degree, most effective version parameters are used, which can bring about biased metrics. The use of the take a look at dataset to assess the great of the model after the validation level affords an impartial assessment of the great of the model.
+By using default, AutoML vision splits your dataset randomly into three separate units:
+80\% of images are used for training , 10\% of images are used for testing
+10\% of images are used for hyper-parameter tuning and/or to decide when to stop training
+Points to be considered during dataset preparation:  
+}
+
+
+
+\begin{itemize}
+	\item[-] Remove Unicode characters in labels if any
+	\item[-] Remove spaces and non-alphanumeric characters in labels.
+	\item[-] Remove empty lines, empty columns 
+	\item[-] Upper and Lower cases to be handled correctly
+	\item[-] Ensure incorrect access control configured for image files. 
+	\item[-] Ensure service account has read or greater access or files must be publicly-readable.
+	\item[-] Ensure URI of image do not point to the current project. Only images in the curent project bucket can be accessed
+\newline
+\newline
+
+\end{itemize}
+
+
+	\subsubsection{ Function:  Sentiment Analysis of Chatbot using BigQuery and Python Script }
+
+
+
+
+{\raggedright
+According to the Accidental Deaths \& Suicides in India (ADSI) report \cite{sheth2019cognitive}, 10,349 farmers committed suicide in 2018 \cite{nagarajah2019review}. This amounts to approximately 28 suicides per day. This is a growing concern in India as 58\% of its population still depends upon agriculture as its primary source of income. Therefore we decided to add sentimental analysis as an additional feature, so that farmers who are in distress can be identified by Khetihar-Chat by performing sentimental analysis on a weekly basis. Here experts can take initiative to run our script weekly and also this feature can be used to detect fake news usually circulated in such apps.In Sentiment analysis, we inspect the given message and identifies the prevailing emotional opinion within the text, especially to determine a sender’s attitude as positive, negative, or neutral. Sentiment analysis is performed through the predict and analyze Sentiment method. 
+}
+
+{\raggedright
+\textbf{Design Flow:}
+}
+
+{\raggedright
+The approach uses conversation. History obtained from the slack chat application and the Chatbot agent stores this conversation history regularly in the database created in BigQuery. The sequence diagram \cite{thorat2020review} will explain weather function implementation more clearly. A model is created in AutoML using the Twitter dataset pre-processed as it resembles more how people communicate in a chat application with other users.A python script is created that takes the data from the BigQuery database and assigns a score of 0 for negative chats, 1 for a neutral chat, and 2 for positive chats by calling the model we have already created in AutoML.
+}
+
+
+{\raggedright
+The Natural Language API is a REST API, and consists of JSON requests and response.
+The Request message will have following fields:
+}
+
+\textbf{1. Document:}: This field have 3 sub fields as follows:
+\begin{itemize}
+	\item[-] Type: this could be HTML or Plain Text.
+	\item[-] Language: This is an optional field and specifies the language of the text we are trying to get sentiment score of.
+	\item[-] Content: This field contains the actual message.
+\end{itemize}'
+
+\textbf{2. Encoding Type:}
+ {\raggedright
+The encoding scheme in which returned character offsets into the text should be calculated, which must match the encoding of the passed text. If this parameter is not set, the request will not be an error, but all such offsets will be set to -1.\\
+}
+
+{\raggedright
+\textbf{Data understanding:}\\
+}
+
+{\raggedright
+For the training dataset we have used US airline tweets data. This dataset has 15 columns including Tweet id, airline sentiment, text that represents actual tweets. The airline sentiment labels each tweets as positive, negative or neutral. And the Text column contains actual tweets without any adulteration. These two columns are very useful for us to train our model.
+}
+
+
+
+{\raggedright
+\textbf{Data Pre-processing:}
+}
+
+{\raggedright
+As for the pre-processing of data, we have assigned a numerical score of 0 for the negative tweets, 1 for the neutral, and 2 for the positive tweets and placed that as our 2nd column and actual tweet as it is for the 1st column. We have removed all other columns, as they are not needed. 
+\newline
+\newline
+}
+
+
+	\subsubsection {Function:  News functionality  }
+
+
+{\raggedright
+In this Function, we have shown how Chatbot responds with recent news articles about a specific topic you ask it. We have used messenger services PeakMetrics News API to power the news feed. The user needs to set a PeakMetrics Developer Account. The developer account is provisioned with the API key. This API key has been used in DialogFlow to enable the API communication and thereby enable the DialogFlow Chatbot with the latest news articles based on the intent. Following is a Sequence Diagram \cite{thorat2020review} to better understand the implementation of this function:
+}
+
+
+{\raggedright
+Intent must have a @sys.any entity here. For example, “Tell me a news about @search”.
+Then the request message to the news API will have following fields
+}
+
+\begin{itemize}
+	\item[-] Method: this has to be a get method.
+	\item[-] BaseURL: Contains the site where we want news from.
+	\item[-] Header: This will contain API key.
+       \item[-] Content: This is actually a @sys.any entity.
+\end{itemize}'
+
+
+
+
+{\raggedright
+As an example, here us a typical conversation with this function(Fig 5.).
+}
+\begin{figure}[h]
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.3]{news_function.jpg}
+  \caption{News information provided by Khetihar }
+\end{figure}
+
+{\raggedright
+-------------------------------------
+}
+
+
+{\raggedright
+\textbf{Farmer1:} Is there any news about Endosulfan?
+\newline
+
+\textbf{Bot:} A group of scientists at Delhi University has now identified a fungus that can help degrade residue of one such insecticide. endosulfan was a commonly used insecticide until its ill effects came to light in Kasaragod district of Kerala.
+\newline
+\newline
+\textbf{Farmer1:} I also have faced the same issue with endosulfan. We have to be careful while using such insecticides.
+\newline
+}
+
+
+{\raggedright
+-------------------------------------
+\newline
+}
+
+
+
+
+
+
+	\subsubsection{ Function:   Weather Forecast Functionality}
+
+
+
+{\raggedright
+
+The Fifth feature/function is for domain-specific chatbot “features.” Each feature has to do at least two things. First, it converts the raw user input into a parameterized function call. We have created intents to interact with the DialogFlow service to help us extract all the necessary parameters (also called as entities). Entity extraction is done differently for each feature. Secondly, it takes the entities and invokes one or more intents to handle the user input. Intents Handler actions defined in Fulfillment code may call out to external services (in case of weather function it calls out for open-weather API) to complete this processing. Depending on the feature, our chatbot returns results as text and/or image response. The sequence diagram \cite{thorat2020review} will explain weather function implementation more clearly.
+}
+\begin{figure}[h]
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.7]{11.png}
+  \caption{Chatbot guiding user about weather }
+\end{figure}
+
+{\raggedright
+Here the Intent must have a @sys.city and @sys.date entities. \newline
+API call can be:\newline
+1. By city ID \newline
+2. By geographic coordinates\newline
+3. By ZIP code\newline
+In the case of weather function, the entity that forms the function parameter is the city name and the time (if the user requires a forecast rather than the current temperature). When this intent is invoked, a cloud function holding the service call to open weather API is triggered along with these parameters. As this is done using cloud function, the call is made only when there is a demand. This reduces cost in case if the external services we are calling are paid.
+As an example, a typical conversation with this functionality goes like this(also shown in fig 6):\newline
+-------------------------------------\newline
+\textbf{Farmer1:} how is the weather in pune today ?\newline
+\textbf{Bot:} Current conditions in the City\newline
+       Pune, India are Partly cloudy with a projected high of\newline
+       19°C or 66°F and a low of\newline
+       15°C or 59°F on\newline
+       2020-08-15\newline
+\textbf{Expert:}I believe today is not a good day for sowing. Please refrain from doing so.\newline
+-------------------------------------\newline
+As we can see from above conversation having a multi-user environment is beneficial, as farmers will not have to solely rely on bot results but experts can also suggests based on their local knowledge.\newline
+}
+
+
+	\subsubsection{ Function: Plantation queries - Database Read-Write }
+
+
+
+\begin{figure}[h]
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.29]{database_queries.png}
+  \caption{DialogFlow Firebase interaction block diagram }
+\end{figure}
+
+\begin{figure}
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.2]{DB_write1.jpg}
+  \caption{Database Write :Expert guiding User and Chatbot to save data in DB }
+\end{figure}
+
+
+\begin{figure}
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.2]{DB_read2.jpg}
+  \caption{Database Read :Chatbot guiding User about vegetation details}
+\end{figure}
+
+
+
+{\raggedright
+
+This function describes the facility of providing Farmers with plantation related queries related to agriculture. Farmers face the challenges of limited information access related to various forums based on CQA (Community questions and answers) (Fig. 7). Even though these forums of CQA are available, there is a lack of expertise among these forums. Also, the response time is not guaranteed.In this work, we have taken care of the above limitations. This function will help farmers with the challenges faced. We have stored all the planation details in the database (Fig. 11). Based on the queries of Farmers, the solutions will be retrieved from the database and provided as a response. The details are taken from veggieharvest.com and stored in the Firebase Real-time Database. Various aspects such as Plant days to Maturity, growing season, soil ph. value...etc. Based on the type of queries, these details are provided as responses. If particular query details are not available in the database, the experts are asked to provide the details. These details are stored in the database immediately. If another farmer asks the same query, the details are retrieved based on the previous conversations and provide as responses. This self-learning feature makes this work different from other Chatbots.
+}
+
+\begin{figure}
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.2]{plantation_schedule_read_funciton_DB.jpg}
+  \caption{Database Read :Chatbot guiding User about Plantation Schedule }
+\end{figure}
+
+{\raggedright
+As an example, here us a typical conversation with this function (Fig. 8,9,10).
+}
+
+{\raggedright
+-------------------------------------
+}
+\begin{figure}
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.6]{Firebase.png}
+  \caption{Data is stored in Firebase Real time Database }
+\end{figure}
+
+{\raggedright
+\textbf{Use case1:} \newline
+\textbf{Farmer1:} what is the growth time, soil ph value required for Beetroot ?  \newline
+\textbf{Bot:} Growth time for Beetroot is 120 days and soil ph value is 5.5. \newline
+-------------------------------------\newline
+\textbf{Use case2:}\newline
+\textbf{Farmer1:} what is the growth time, soil ph value required for Spinach ?\newline
+\textbf{Bot:} I do not have answer for this , Expert Please help here .\newline
+\textbf{Expert:} Growth time for Spinach is 140 days and soil ph value is 6.5.\newline
+\textbf{Farmer2:} what is the growth time, soil ph value required for Spinach ?\newline
+\textbf{Bot:} Growth time for Spinach is 140 days and soil ph value is 6.5.\newline
+-------------------------------------\newline\newline
+}
+
+
+
+	\section{KHETIHAR-CHAT COMPARATIVE EVALUATIONS}
+
+{\raggedright
+We conducted a user study in July 2020 to understand the usability of the Khetihar system. To understand the usability of the khetihar, we conducted a user study.
+}
+
+
+\subsection{Participants}
+
+
+{\raggedright
+There were 15 farmers as Participants (10 males, 5 females) with an average age of 30.5± 12 years and farming experience of 10 + years. They were from different villages across Pune, Maharashtra in India. Krishi Adhikari’s helped us to involve the participants with the support of Local NGO. Out of 15 participants, 10 were semiliterate, 3 were literate and 2 were illiterate. The farmers were selected such that they had an idea about smartphones and were regular users of messenger services and video calling features. Out of 15 participants, 4 were entrepreneurs. The farmers who have undergone a 30-day agriculture-related training program by local NGOs are referred to as Agri-entrepreneurs. Almost everybody had an idea about KCC.
+}
+
+
+\subsection{Procedure}
+
+
+{\raggedright
+Participants were trained on how to use the app and do some basic querying regarding exchanging greetings. Participants were given infected leaves of different plants. Further, they were guided to click and upload the pictures of the diseased leaf on the khetihar app to identify the disease. They were asked to find out the remedy by querying the Chatbot Khetihar for that particular disease, by providing optional responses to the questions asked by khetihar. Participants were further asked to use other functionalities of the chatbot like plantation schedule, expert's involvement in chat to get the answers if those are not available in the database. Also, weather and news functions were asked to be carried on the device provided to the participants. One of the researchers was helping out the participants. Post this activity, all the participants were interviewed for their observations and feedback. Finally, there were requested to rate the app khetihar based on the following factors.
+}
+
+
+\begin{enumerate}
+	\item[] Ease of Use.
+	\item[] Response time
+	\item[] Difficulty in Learning
+	\item[] Willingness to Use
+	\item[] Enhancements
+\end{enumerate}
+
+{\raggedright\textbf{Analysis of the khetihar app by Farmers:}\newline}
+{\raggedright
+In total, participants provided 173 inputs to Khetihar. The Inputs were in the form of questions, answers, or comments. the figure shows the ratings for different parameters for Khetihar. For understanding the challenges in the design and the opportunities in the conversational systems for rural Indian farming, we focussed on these 2 main aspects of Khetihar\newline(1) how is the acceptability of Khetihar as an information system as an information source\newline(2) the usability in interacting with conversational interfaces.The results and details were noted and transcribed in English later. 
+}
+
+    \section{RESULTS}
+
+{\raggedright
+From the experimental analysis of 15 Farmers, it was evaluated that the ease of 80 percent of the farmers felt that khetihar was easy to use, 95 percent khetihar responded promptly, the learning difficulty was 10 percent, 15 percent of the farmers felt they might need help in using the app (Fig. 12). The best thing in this study was 90 percent of the Farmers were willing to use khetihar in future.
+}
+
+\begin{figure}[h]
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.7]{results_study.png}
+  \caption{Analysis of Khetihar chatbot App by Farmers}
+\end{figure}
+
+{\raggedright
+\textbf{Information Acceptability:}\newline
+}
+{\raggedright
+Based on the study, we concluded that khetihar was willingly accepted by the farmers, as an information source for agricultural needs. Almost 90 were willing to use khetihar in the future. They were willing to learn it and share the knowledge of khetihar among their friends and families. They kept on experimenting with the app to explore all the possible options. Overall they were happy to learn about khetihar, which will help them to cater to their needs. 
+Below is the summary that emerged from the user study on information assistance provided by khetihar.
+}
+
+
+{\raggedright
+\textbf{Precise and Localized Answers: }
+}
+
+{\raggedright
+Localization and Specificity and localization were identified as major factors to the informational needs.We had considered the localization factors in design very carefully. The remedies and medicines for plants that were suggested by khetihar were available. Also, the leaf identification function was very well appreciated by the Farmers. The leaf names identified by functions were as per the Farmer's location. Based on the area khetihar gave different solutions and responses
+}
+
+
+
+{\raggedright
+\textbf{Trust: }
+}
+
+{\raggedright
+The participants trusted khetihar more broadly after the activity. Some of the participants noted down the responses, regarding the disease remedies as they had faced those concerns in their farms. Participants explored the app to test the app by asking different questions and got the right answers. This helped in building trust in the Farmers with Khetihar. Some of the participants endorsed the app with their friends and asked them to install it on their phone. 
+}
+
+{\raggedright
+\textbf{Over-expectation:}
+}
+
+{\raggedright
+Some of the participants had over expectations as they had a good experience in agricultural related situations. Overall out of 210 queries asked in the survey 25 queries were not answered. This led to some dissatisfaction however, 90 percent felt it covered almost all the scenarios and situations.
+}
+
+{\raggedright
+\textbf{Chatbot Usability:}
+}
+
+{\raggedright
+The usability factor was 80 percent in the study, which was a good number because this was the first-time use of khetihar. Farmers did expect some human characteristics from khetihar; unfortunately, it was not built for that. However, this is a topic for further study. The news function also gave them news about the word they used as intended. This feature gave the Farmers some excitement about getting an update on their subject of interest. The image identification feature was very well appreciated by the farmers. This will further prove to them as a boon for saving their crops from pests.
+}
+
+
+	
+
+
+\subsection{Precision and Accuracy: for Image Identification and Sentimental Analysis:}
+
+
+
+{\raggedright
+Following matrices are for the performance evaluation: F1 Score: The F1 score is a measure of a model's accuracy. The accuracy p and recall r of the test is taken into account in calculating the score.Accuracy: The accuracy of the model is computed as follows:  Where TP is true positive, FP is false positive, FN is false negative.\newline
+Precision = TP/ (TP + FP).\newline
+Recall = TP/ (TP + FN) .\newline
+F1 Score = 2 * (Recall * Precision) / (Recall + Precision).\newline
+Accuracy = number of correct predictions/number of total predictions\newline
+}
+
+{\raggedright
+\begin{table}[ht]
+\caption{Precision and Accuracy scores} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c} % centered columns (4 columns)
+\hline %inserts double horizontal lines
+Functions & Accuracy & Precision & Recall \\ [0.ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+Sentiment Analysis & 0.92  & 0.8485 & 0.8489 \\ % inserting body of the table
+Image Identification & 0.94 & 0.9213 & 0.958  \\
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+}
+
+
+\subsection{Analysis for Sentimental Analysis Evaluation:}
+
+{\raggedright
+Below table shows the Confusion matrix for the Sentimental Analysis evaluation.
+}
+
+{\raggedright
+\begin{table}[ht]
+\caption{Confusion Matrix} % title of Table
+\centering % used for centering table
+\begin{tabular}{c c c c} % centered columns (4 columns)
+\hline %inserts double horizontal lines
+Actual Score & Sentiment 0 & Sentiment 1 & Sentiment 2 \\ [0.ex] % inserts table
+%heading
+\hline % inserts single horizontal line
+Sentiment 0 & 0.95  & 0.03 & 0.01 \\ % inserting body of the table
+Sentiment 1 & 0.2 & 0.63 & 0.08  \\
+Sentiment 2 & 0.12 & 0.14  & 0.74 \\ [1ex] % [1ex] adds vertical space
+\hline %inserts single line
+\end{tabular}
+\label{table:nonlin} % is used to refer this table in the text
+\end{table}
+}
+
+
+{\raggedright
+Below Graph shows percentage of Positive, Negative and Neutral conversations in the Chatbot (Fig. 13).
+}
+\begin{figure}[h]
+ \centering
+   \includegraphics[keepaspectratio=true,scale=0.4]{positivity.png}
+  \caption{Positive,Negative and Neutral Sentiments Percentage}
+\end{figure}
+
+
+
+
+	\section{Discussions}
+
+{\raggedright
+In this paper, we proposed a potential solution for the information mismatch observed by farmers with semi-literacy and growing technical experiences. During our study, we observed machine learning techniques if included with such chatbots provide more efficient results. And this was confirmed by the feedback we got from farmers of Pabal village. Below we discuss future works and limitations associated with such solutions.
+}
+
+
+\subsection{Future Works:}
+
+
+{\raggedright
+Previous studies related to such problems indicated that Audio+text provides better usability and the ability to incorporate illiterate users. We suggest that Khetihar-chat multi-user and machine learning ability if consolidated with such works provides a much-finished product for such a problem. As with our solution, we have resolved the problem of scalability to a greater extent. Therefore incorporating multiple languages with speech-to-text options can be a  promising future work. Also incorporating local experts provides better understandability of local problems. Here we suggest, a localized group of farmers with local experts is a better way to tackle such issue.
+}
+
+
+
+\subsection{Limitations:}
+
+
+{\raggedright
+We acknowledge several limitations of this solution. First, every part of India does not have the same type of products available(For example Bharat Rasayan Ltd does not have much presence in the south). Therefore, gathering data from every part of India is a huge time consuming and costly affair. Experts in localized groups will have to pay an extra effort for such a task. Second, we could only interact with farmers from the Pabal district because of lockdown, limited resources, and travel restrictions. Covering different villages from all over India could provide more usability and preference information. Third, Khetihar-chat could also fail in some villages in India where there is low internet connectivity. Finally, we used the primary data gathering method to understand the farmer's needs. But we can not deny, some of the data we gathered is not affected by false information given by farmers.
+}
+
+
+
+	\section{Conclusions}
+
+{\raggedright
+In Agriculture dominated economy like India, Building an application that is scalable, trust-worthy, real-time and 24/7 responsive system is a major and an open problem. To tackle such a challenge, we proposed a multi-user chat application called Khetihar-Chat, which combined natural language processing and machine learning technologies to naturally converse with farmers in answering their farming-related queries. We included experts and other farmers together in this application to increase the trust factor which such application usually lacks \cite{lee2018voice}. The conversational intelligence of our chatbot was elevated by analysis of the large corpus of Agricultural datasets and guided by agricultural-experts associated with Prasar Bharti who work closely with farmers. Our study with farmers from Pabal, taluka kendur near Pune, India indicated that it is possible to provide satisfying and trust-worthy information through a chatbot based application. Our study indicated that many farmers find a chat application with multi-users and some real experts along with a smart chatbot more trust-worthy than a one-to-one conversational chatbot. Also, many farmers find it easier to upload an image of the crop with a disease rather than explaining it. The positive feedback we got from farmers indicates that a multi-user smart chatbot based technology delivered through a smartphone can be an effective tool to solve the information access problem in rural areas especially those close to big cities but with limited literacy and growing technology experience.
+}
+
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{khetihar_bibtex1}
+
+
+
+\end{document}
